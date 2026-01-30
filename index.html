@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>منظومة البشوات - الإصدار النهائي</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+      :root {
+        --bg-body: #e0e4e8;
+        --border-color: #000000;
+        --row-hover: #fff9c4;
+        --accent: #ffd700;
+        --primary: #1a237e;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+      }
+      body {
+        background: var(--bg-body);
+        padding: 10px;
+        scroll-behavior: smooth;
+      }
+
+      /* --- صفحة الدخول والساعة --- */
+      #login-page {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        background: linear-gradient(-45deg, #0d47a1, #1e293b);
+      }
+      .analog-clock {
+        width: 220px;
+        height: 220px;
+        background: white;
+        border: 10px solid var(--accent);
+        border-radius: 50%;
+        position: relative;
+        margin-bottom: 30px;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+      }
+      .clock-num {
+        position: absolute;
+        font-weight: bold;
+        font-size: 20px;
+        color: #000;
+      }
+      .n12 {
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .n3 {
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .n6 {
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .n9 {
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .hand {
+        position: absolute;
+        bottom: 50%;
+        left: 50%;
+        transform-origin: bottom;
+        border-radius: 10px;
+        z-index: 5;
+      }
+      .hour {
+        width: 7px;
+        height: 55px;
+        background: #000;
+      }
+      .min {
+        width: 5px;
+        height: 80px;
+        background: #333;
+      }
+      .sec {
+        width: 2px;
+        height: 90px;
+        background: #d32f2f;
+      }
+
+      /* --- تصميم الجدول والأزرار --- */
+      .container {
+        max-width: 1250px;
+        margin: auto;
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        border: 4px solid var(--border-color);
+      }
+      .sticky-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: var(--bg-body);
+        padding-bottom: 10px;
+      }
+      .entry-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 10px;
+        background: #f1f5f9;
+        padding: 25px 15px 15px;
+        border-radius: 12px;
+        border: 3px solid var(--border-color);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        border: 3px solid var(--border-color);
+      }
+      th,
+      td {
+        border: 2px solid var(--border-color);
+        padding: 12px 5px;
+        text-align: center;
+        font-weight: 900;
+        font-size: 18px;
+      }
+      th {
+        background: #d1d5db;
+        position: sticky;
+        top: 205px;
+        z-index: 900;
+      }
+      tbody tr:hover {
+        background-color: var(--row-hover) !important;
+      }
+      .total-row {
+        background: var(--border-color) !important;
+        color: var(--accent) !important;
+      }
+
+      /* --- المودال (نافذة الخيارات) --- */
+      #options-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 10001;
+        justify-content: center;
+        align-items: center;
+      }
+      .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        width: 320px;
+        border: 4px solid var(--primary);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+      .btn-main {
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        border: none;
+        font-weight: 900;
+        color: white;
+        margin: 5px;
+      }
+      .archive-item {
+        background: var(--primary);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 5px;
+        display: inline-block;
+        font-weight: bold;
+        border: 2px solid #000;
+      }
+
+      @media print {
+        .no-print {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body onkeydown="handleGlobalEnter(event)">
+    <div id="login-page">
+      <div class="analog-clock">
+        <div class="clock-num n12">12</div>
+        <div class="clock-num n3">3</div>
+        <div class="clock-num n6">6</div>
+        <div class="clock-num n9">9</div>
+        <div id="h-hand" class="hand hour"></div>
+        <div id="m-hand" class="hand min"></div>
+        <div id="s-hand" class="hand sec"></div>
+      </div>
+      <div
+        style="
+          background: rgba(255, 255, 255, 0.1);
+          padding: 30px;
+          border-radius: 20px;
+          text-align: center;
+          width: 350px;
+          backdrop-filter: blur(10px);
+        "
+      >
+        <h2 style="color: white; margin-bottom: 20px">ادخل يا باشا</h2>
+        <input
+          type="password"
+          id="passInput"
+          placeholder="كلمة المرور"
+          style="
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            text-align: center;
+            font-size: 20px;
+          "
+          autofocus
+        />
+        <button
+          onclick="login()"
+          class="btn-main"
+          style="
+            background: var(--accent);
+            color: #000;
+            width: 100%;
+            margin-top: 15px;
+          "
+        >
+          دخول
+        </button>
+      </div>
+    </div>
+
+    <div class="container" id="main-content" style="display: none">
+      <div class="sticky-header no-print">
+        <section
+          style="
+            background: #f1f5f9;
+            border: 3px solid #000;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+          "
+        >
+          <div style="display: flex; gap: 12px">
+            <input
+              type="text"
+              id="saveName"
+              placeholder="اسم الملف للحفظ..."
+              style="
+                flex: 1;
+                padding: 10px;
+                border: 2px solid #000;
+                border-radius: 8px;
+                font-weight: bold;
+              "
+            />
+            <button
+              class="btn-main"
+              style="background: green"
+              onclick="saveToArchive()"
+            >
+              💾 حفظ
+            </button>
+            <input
+              type="text"
+              id="searchBox"
+              placeholder="بحث..."
+              oninput="filterArchive()"
+              style="
+                flex: 1;
+                padding: 10px;
+                border: 2px solid #000;
+                border-radius: 8px;
+              "
+            />
+          </div>
+          <div id="archiveList" style="margin-top: 12px"></div>
+        </section>
+
+        <div class="entry-form">
+          <div style="position: relative">
+            <input
+              type="number"
+              id="f_count"
+              oninput="autoCalc(this.value)"
+              style="
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #000;
+                border-radius: 8px;
+                text-align: center;
+                font-weight: 900;
+              "
+            /><label
+              style="
+                position: absolute;
+                top: -12px;
+                right: 10px;
+                background: #f1f5f9;
+                font-size: 12px;
+                font-weight: bold;
+              "
+              >عدد الحركات</label
+            >
+          </div>
+          <div style="position: relative">
+            <input
+              type="number"
+              id="f_a"
+              style="
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #000;
+                text-align: center;
+                font-weight: 900;
+              "
+            /><label
+              style="
+                position: absolute;
+                top: -12px;
+                right: 10px;
+                background: #f1f5f9;
+                font-size: 11px;
+              "
+              >أمانات</label
+            >
+          </div>
+          <div style="position: relative">
+            <input
+              type="number"
+              id="f_s"
+              style="
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #000;
+                text-align: center;
+                font-weight: 900;
+              "
+            /><label
+              style="
+                position: absolute;
+                top: -12px;
+                right: 10px;
+                background: #f1f5f9;
+                font-size: 11px;
+              "
+              >ط.شهيد</label
+            >
+          </div>
+          <div style="position: relative">
+            <input
+              type="number"
+              id="f_p"
+              style="
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #000;
+                text-align: center;
+                font-weight: 900;
+              "
+            /><label
+              style="
+                position: absolute;
+                top: -12px;
+                right: 10px;
+                background: #f1f5f9;
+                font-size: 11px;
+              "
+              >ط.شرطة</label
+            >
+          </div>
+          <div style="position: relative">
+            <input
+              type="number"
+              id="f_old"
+              style="
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #000;
+                text-align: center;
+                font-weight: 900;
+              "
+            /><label
+              style="
+                position: absolute;
+                top: -12px;
+                right: 10px;
+                background: #f1f5f9;
+                font-size: 11px;
+              "
+              >مسنين</label
+            >
+          </div>
+          <div style="position: relative">
+            <input
+              type="number"
+              id="f_dis"
+              style="
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #000;
+                text-align: center;
+                font-weight: 900;
+              "
+            /><label
+              style="
+                position: absolute;
+                top: -12px;
+                right: 10px;
+                background: #f1f5f9;
+                font-size: 11px;
+              "
+              >إعاقة</label
+            >
+          </div>
+          <div style="position: relative">
+            <input
+              type="number"
+              id="f_m"
+              value="35"
+              readonly
+              style="
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #000;
+                background: #ddd;
+                text-align: center;
+                font-weight: 900;
+              "
+            /><label
+              style="
+                position: absolute;
+                top: -12px;
+                right: 10px;
+                background: #f1f5f9;
+                font-size: 11px;
+              "
+              >ميكنة</label
+            >
+          </div>
+          <button
+            onclick="saveToTable()"
+            class="btn-main"
+            style="background: #059669"
+          >
+            إضافة (Enter)
+          </button>
+        </div>
+      </div>
+
+      <table id="mainTable">
+        <thead>
+          <tr>
+            <th style="width: 50px">م</th>
+            <th>عدد الحركات</th>
+            <th>أمانات</th>
+            <th>ط.شهيد</th>
+            <th>ط.شرطة</th>
+            <th>مسنين</th>
+            <th>إعاقة</th>
+            <th>ميكنة</th>
+          </tr>
+        </thead>
+        <tbody id="fixedBody"></tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="2">الإجمالــــــــــــــــي</td>
+            <td id="sum_a">0</td>
+            <td id="sum_s">0</td>
+            <td id="sum_p">0</td>
+            <td id="sum_old">0</td>
+            <td id="sum_dis">0</td>
+            <td id="sum_m">0</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="no-print" style="text-align: center; margin-top: 20px">
+        <button
+          class="btn-main"
+          style="background: #1e293b"
+          onclick="window.print()"
+        >
+          🖨️ طباعة
+        </button>
+        <button
+          class="btn-main"
+          style="background: #166534"
+          onclick="exportToExcel()"
+        >
+          📊 إكسيل
+        </button>
+        <button
+          class="btn-main"
+          style="background: #c62828"
+          onclick="clearData()"
+        >
+          🗑️ مسح الجدول
+        </button>
+      </div>
+    </div>
+
+    <div id="options-modal" class="no-print">
+      <div class="modal-content">
+        <h3
+          id="modalTitle"
+          style="margin-bottom: 20px; color: var(--primary)"
+        ></h3>
+        <button
+          class="btn-main"
+          style="background: var(--primary); width: 90%"
+          id="btnEdit"
+        >
+          ✏️ تعديل السجل
+        </button>
+        <button
+          class="btn-main"
+          style="background: #c62828; width: 90%"
+          id="btnDelete"
+        >
+          🗑️ حذف الملف نهائياً
+        </button>
+        <button
+          class="btn-main"
+          style="background: #757575; width: 90%"
+          onclick="closeModal()"
+        >
+          إلغاء
+        </button>
+      </div>
+    </div>
+
+    <script>
+      function updateClock() {
+        const now = new Date();
+        const s = now.getSeconds() * 6;
+        const m = now.getMinutes() * 6;
+        const h = (now.getHours() % 12) * 30 + now.getMinutes() / 2;
+        document.getElementById("s-hand").style.transform = `rotate(${s}deg)`;
+        document.getElementById("m-hand").style.transform = `rotate(${m}deg)`;
+        document.getElementById("h-hand").style.transform = `rotate(${h}deg)`;
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      let rowsData =
+        JSON.parse(localStorage.getItem("fin_v9")) ||
+        Array.from({ length: 30 }, () => ({
+          count: "",
+          a: 0,
+          s: 0,
+          p: 0,
+          old: 0,
+          dis: 0,
+          m: 0,
+        }));
+      let archive = JSON.parse(localStorage.getItem("fin_arch_v9")) || {};
+      let selectedKey = "";
+
+      function login() {
+        if (document.getElementById("passInput").value === "123") {
+          document.getElementById("login-page").style.display = "none";
+          document.getElementById("main-content").style.display = "block";
+          draw();
+          renderArchive();
+        } else alert("خطأ!");
+      }
+
+      function autoCalc(v) {
+        if (!v) {
+          ["f_a", "f_s", "f_p", "f_old", "f_dis"].forEach(
+            (id) => (document.getElementById(id).value = "")
+          );
+          return;
+        }
+        let n = parseFloat(v);
+        document.getElementById("f_a").value = n * 100;
+        document.getElementById("f_s").value = n * 5;
+        document.getElementById("f_p").value = n * 15;
+        document.getElementById("f_old").value = n * 5;
+        document.getElementById("f_dis").value = n * 5;
+      }
+
+      function draw() {
+        const body = document.getElementById("fixedBody");
+        body.innerHTML = "";
+        rowsData.forEach((row, i) => {
+          body.innerHTML += `<tr id="row-${i}">
+                    <td style="background:#eee">${i + 1}</td>
+                    <td contenteditable="true" onblur="update(${i},'count',this.innerText)">${
+            row.count
+          }</td>
+                    <td contenteditable="true" onblur="update(${i},'a',this.innerText)">${
+            row.a || ""
+          }</td>
+                    <td contenteditable="true" onblur="update(${i},'s',this.innerText)">${
+            row.s || ""
+          }</td>
+                    <td contenteditable="true" onblur="update(${i},'p',this.innerText)">${
+            row.p || ""
+          }</td>
+                    <td contenteditable="true" onblur="update(${i},'old',this.innerText)">${
+            row.old || ""
+          }</td>
+                    <td contenteditable="true" onblur="update(${i},'dis',this.innerText)">${
+            row.dis || ""
+          }</td>
+                    <td contenteditable="true" onblur="update(${i},'m',this.innerText)">${
+            row.m || ""
+          }</td>
+                </tr>`;
+        });
+        calc();
+        localStorage.setItem("fin_v9", JSON.stringify(rowsData));
+      }
+
+      function update(idx, f, v) {
+        rowsData[idx][f] = f === "count" ? v : Number(v);
+        draw();
+      }
+
+      function saveToTable() {
+        const val = document.getElementById("f_count").value;
+        if (!val) return;
+        let idx = rowsData.findIndex((r) => r.count === "" || r.count === null);
+        if (idx === -1) return alert("الجدول ممتلئ");
+        rowsData[idx] = {
+          count: val,
+          a: Number(document.getElementById("f_a").value),
+          s: Number(document.getElementById("f_s").value),
+          p: Number(document.getElementById("f_p").value),
+          old: Number(document.getElementById("f_old").value),
+          dis: Number(document.getElementById("f_dis").value),
+          m: 35,
+        };
+        draw();
+        window.scrollTo({
+          top: document.getElementById(`row-${idx}`).offsetTop - 250,
+          behavior: "smooth",
+        });
+        document
+          .querySelectorAll(".entry-form input:not(#f_m)")
+          .forEach((i) => (i.value = ""));
+        document.getElementById("f_count").focus();
+      }
+
+      function calc() {
+        let t = rowsData.reduce(
+          (acc, c) => {
+            acc.a += Number(c.a || 0);
+            acc.s += Number(c.s || 0);
+            acc.p += Number(c.p || 0);
+            acc.old += Number(c.old || 0);
+            acc.dis += Number(c.dis || 0);
+            acc.m += Number(c.m || 0);
+            return acc;
+          },
+          { a: 0, s: 0, p: 0, old: 0, dis: 0, m: 0 }
+        );
+        for (let k in t) document.getElementById("sum_" + k).innerText = t[k];
+      }
+
+      function saveToArchive() {
+        let n = document.getElementById("saveName").value;
+        if (!n) return alert("ادخل اسم!");
+        archive[n] = JSON.parse(JSON.stringify(rowsData));
+        localStorage.setItem("fin_arch_v9", JSON.stringify(archive));
+        alert("تم الحفظ وتصفير الجدول");
+        clearData();
+        renderArchive();
+        document.getElementById("saveName").value = "";
+      }
+
+      function renderArchive(f = "") {
+        const list = document.getElementById("archiveList");
+        list.innerHTML = "";
+        Object.keys(archive).forEach((k) => {
+          if (k.includes(f)) {
+            let d = document.createElement("div");
+            d.className = "archive-item";
+            d.innerText = "📁 " + k;
+            d.onclick = () => {
+              selectedKey = k;
+              document.getElementById("modalTitle").innerText = k;
+              document.getElementById("options-modal").style.display = "flex";
+            };
+            list.appendChild(d);
+          }
+        });
+      }
+
+      document.getElementById("btnEdit").onclick = () => {
+        rowsData = JSON.parse(JSON.stringify(archive[selectedKey]));
+        draw();
+        closeModal();
+        window.scrollTo(0, 0);
+      };
+      document.getElementById("btnDelete").onclick = () => {
+        if (confirm("حذف الملف نهائياً؟")) {
+          delete archive[selectedKey];
+          localStorage.setItem("fin_arch_v9", JSON.stringify(archive));
+          renderArchive();
+          closeModal();
+        }
+      };
+
+      function closeModal() {
+        document.getElementById("options-modal").style.display = "none";
+      }
+      function filterArchive() {
+        renderArchive(document.getElementById("searchBox").value);
+      }
+      function clearData() {
+        rowsData = Array.from({ length: 30 }, () => ({
+          count: "",
+          a: 0,
+          s: 0,
+          p: 0,
+          old: 0,
+          dis: 0,
+          m: 0,
+        }));
+        draw();
+      }
+      function handleGlobalEnter(e) {
+        if (e.key === "Enter") {
+          if (document.getElementById("login-page").style.display !== "none")
+            login();
+          else saveToTable();
+        }
+      }
+      function exportToExcel() {
+        const ws = XLSX.utils.json_to_sheet(rowsData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "الماليات");
+        XLSX.writeFile(wb, "Report.xlsx");
+      }
+    </script>
+  </body>
+</html>
