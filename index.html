@@ -1,15 +1,29 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
   <head>
+    <link
+      rel="manifest"
+      href="data:application/manifest+json;base64,ewogICJuYW1lIjogIm1vbnpvbWF0IGFsYmFzaGF3YXQiLAogICJzaG9ydF9uYW1lIjogImFsYmFzaGF3YXQiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzFhMjM3ZSIsCiAgInRoZW1lX2NvbG9yIjogIiMxYTIzN2UiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2kuaWJiLmNvL1ZXTVhzTHF6L1doYXRzLUFwcC1JbWFnZS0yMDI2LTAxLTIzLWF0LTUtNDEtMTktUE0uanBnIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9qcGVnIgogICAgfQogIF0KfQ=="
+    />
+    <link
+      rel="icon"
+      type="image/jpeg"
+      href="https://i.ibb.co/VWMxsLqz/Whats-App-Image-2026-01-23-at-5-41-19-PM.jpg"
+    />
+    <meta
+      property="og:image"
+      content="https://i.ibb.co/VWMxsLqz/Whats-App-Image-2026-01-23-at-5-41-19-PM.jpg"
+    />
+    <meta property="og:image:type" content="image/jpeg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:image"
+      content="https://i.ibb.co/VWMxsLqz/Whats-App-Image-2026-01-23-at-5-41-19-PM.jpg"
+    />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/jpeg" href="https://i.ibb.co/VWMxsLqz/Whats-App-Image-2026-01-23-at-5-41-19-PM.jpg">
-    <meta property="og:image" content="https://i.ibb.co/VWMxsLqz/Whats-App-Image-2026-01-23-at-5-41-19-PM.jpg">
-<meta property="og:image:type" content="image/jpeg">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://i.ibb.co/VWMxsLqz/Whats-App-Image-2026-01-23-at-5-41-19-PM.jpg">
-    <title>منظومة البشوات   </title>
+    <title>منظومة البشوات - الإصدار النهائي</title>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
       :root {
@@ -195,6 +209,42 @@
         border: 2px solid #000;
       }
 
+      /* --- قسم الإجمالي العام الموحد --- */
+      .grand-total-section {
+        margin-top: 30px;
+        padding: 20px;
+        border: 4px solid var(--border-color);
+        border-radius: 15px;
+        background: #e2e8f0;
+      }
+      .grand-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
+        margin-top: 10px;
+      }
+      .grand-box {
+        text-align: center;
+      }
+      .grand-box label {
+        display: block;
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #000;
+      }
+      .grand-box input {
+        width: 100%;
+        padding: 12px;
+        text-align: center;
+        font-weight: 900;
+        font-size: 20px;
+        border: 3px solid var(--border-color);
+        border-radius: 10px;
+        background: #fff;
+        color: #d32f2f; /* لون مميز للإجماليات الثابتة */
+      }
+
       @media print {
         .no-print {
           display: none !important;
@@ -320,7 +370,7 @@
                 top: -12px;
                 right: 10px;
                 background: #f1f5f9;
-                font-size: 12px;
+                font-size: 17px;
                 font-weight: bold;
               "
               >عدد الحركات</label
@@ -343,7 +393,7 @@
                 top: -12px;
                 right: 10px;
                 background: #f1f5f9;
-                font-size: 11px;
+                font-size: 17px;
               "
               >أمانات</label
             >
@@ -365,7 +415,7 @@
                 top: -12px;
                 right: 10px;
                 background: #f1f5f9;
-                font-size: 11px;
+                font-size: 17px;
               "
               >ط.شهيد</label
             >
@@ -387,7 +437,7 @@
                 top: -12px;
                 right: 10px;
                 background: #f1f5f9;
-                font-size: 11px;
+                font-size: 17px;
               "
               >ط.شرطة</label
             >
@@ -409,7 +459,7 @@
                 top: -12px;
                 right: 10px;
                 background: #f1f5f9;
-                font-size: 11px;
+                font-size: 17px;
               "
               >مسنين</label
             >
@@ -431,7 +481,7 @@
                 top: -12px;
                 right: 10px;
                 background: #f1f5f9;
-                font-size: 11px;
+                font-size: 17px;
               "
               >إعاقة</label
             >
@@ -456,7 +506,7 @@
                 top: -12px;
                 right: 10px;
                 background: #f1f5f9;
-                font-size: 11px;
+                font-size: 17px;
               "
               >ميكنة</label
             >
@@ -487,7 +537,7 @@
         <tbody id="fixedBody"></tbody>
         <tfoot>
           <tr class="total-row">
-            <td colspan="2">الإجمالــــــــــــــــي</td>
+            <td colspan="2">الإجمالــــــــــــــــي للملف الحالي</td>
             <td id="sum_a">0</td>
             <td id="sum_s">0</td>
             <td id="sum_p">0</td>
@@ -497,6 +547,46 @@
           </tr>
         </tfoot>
       </table>
+
+      <section class="grand-total-section no-print">
+        <h2
+          style="
+            text-align: center;
+            color: #000;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+          "
+        >
+          اجمالى كافة الملفات المحفوظة
+        </h2>
+        <div class="grand-grid">
+          <div class="grand-box">
+            <label>مجموع الأمانات</label>
+            <input type="number" id="grand_sum_a" readonly />
+          </div>
+          <div class="grand-box">
+            <label>مجموع ط.شهيد</label>
+            <input type="number" id="grand_sum_s" readonly />
+          </div>
+          <div class="grand-box">
+            <label>مجموع ط.شرطة</label>
+            <input type="number" id="grand_sum_p" readonly />
+          </div>
+          <div class="grand-box">
+            <label>مجموع مسنين</label>
+            <input type="number" id="grand_sum_old" readonly />
+          </div>
+          <div class="grand-box">
+            <label>مجموع إعاقة</label>
+            <input type="number" id="grand_sum_dis" readonly />
+          </div>
+          <div class="grand-box">
+            <label>مجموع ميكنة</label>
+            <input type="number" id="grand_sum_m" readonly />
+          </div>
+        </div>
+      </section>
 
       <div class="no-print" style="text-align: center; margin-top: 20px">
         <button
@@ -710,6 +800,30 @@
             list.appendChild(d);
           }
         });
+        // تحديث الإجمالي العام تلقائياً فورياً
+        calculateGrandTotal();
+      }
+
+      // الوظيفة المسؤولة عن جمع كل الملفات في الأرشيف ووضع أرقام ثابتة
+      function calculateGrandTotal() {
+        let grand = { a: 0, s: 0, p: 0, old: 0, dis: 0, m: 0 };
+        Object.values(archive).forEach((fileRows) => {
+          fileRows.forEach((row) => {
+            grand.a += Number(row.a || 0);
+            grand.s += Number(row.s || 0);
+            grand.p += Number(row.p || 0);
+            grand.old += Number(row.old || 0);
+            grand.dis += Number(row.dis || 0);
+            grand.m += Number(row.m || 0);
+          });
+        });
+        // تعبئة الخانات (كلها Readonly)
+        document.getElementById("grand_sum_a").value = grand.a;
+        document.getElementById("grand_sum_s").value = grand.s;
+        document.getElementById("grand_sum_p").value = grand.p;
+        document.getElementById("grand_sum_old").value = grand.old;
+        document.getElementById("grand_sum_dis").value = grand.dis;
+        document.getElementById("grand_sum_m").value = grand.m;
       }
 
       document.getElementById("btnEdit").onclick = () => {
@@ -757,6 +871,26 @@
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "الماليات");
         XLSX.writeFile(wb, "Report.xlsx");
+      }
+      // تسجيل الخدمة للعمل بدون إنترنت
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          const swCode = `
+      const CACHE_NAME = 'basha-v1';
+      const assets = [ './', './index.html' ]; // تأكد أن اسم ملفك index.html
+
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(assets)));
+      });
+
+      self.addEventListener('fetch', e => {
+        e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+      });
+    `;
+          const blob = new Blob([swCode], { type: "application/javascript" });
+          const swUrl = URL.createObjectURL(blob);
+          navigator.serviceWorker.register(swUrl);
+        });
       }
     </script>
   </body>
